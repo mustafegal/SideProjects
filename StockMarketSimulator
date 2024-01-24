@@ -1,0 +1,223 @@
+//Mustaf Egal
+//11/24/23
+
+import java.io.File;    // import java classes
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Random;
+import java.util.Scanner;
+
+public class StockMarketSimulator {     //declare stock market simulator class
+    static final int NUM_STOCKS = 10;       // 10 stocks
+    static String[] stockNames = new String[NUM_STOCKS]; // array stock names
+    static double[] stockPrices = new double[NUM_STOCKS];   //array stock prices
+    static int[] userShares = new int[NUM_STOCKS];  //array user shares
+    static double userBalance = 10000.0; // give user initial balance
+    static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {  // the main method for the code
+        initializeStockData(); // stock data
+        loadPortfolio(); // loads information
+
+        while (true) {
+            displayMenu(); // menu
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) { // pick option for stock market from the menu
+                case 1:
+                    displayStocks();
+                    break;
+                case 2:
+                    buyStock(scanner);
+                    break;
+                case 3:
+                    sellStock(scanner);
+                    break;
+                case 4:
+                    displayPortfolio();
+                    break;
+                case 5:
+                    savePortfolio();
+                    break;
+                case 6:
+                    System.out.println("Exiting...");
+
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");  // error message for wrong input
+            }
+
+            updateStockPrices();
+        }
+    }
+
+    public static void initializeStockData() {      // stock names for 10 stocks
+        stockNames[0] = "Apple";
+        stockNames[1] = "Google";
+        stockNames[2] = "Amazon";
+        stockNames[3] = "GameStop";
+        stockNames[4] = "Netflix";
+        stockNames[5] = "Tesla";
+        stockNames[6] = "Microsoft";
+        stockNames[7] = "PlayStation";
+        stockNames[8] = "Disney";
+        stockNames[9] = "Delta";
+
+        try (Scanner fileScanner = new Scanner(new File("initial_stock_prices.txt"))) {
+            for (int i = 0; i < NUM_STOCKS && fileScanner.hasNextLine(); i++) {
+                stockPrices[i] = Double.parseDouble(fileScanner.nextLine());    // get initial stock prices
+            }
+        } catch (FileNotFoundException e) { // no initial stock market prices file
+            System.out.println("File not found: " + e.getMessage());
+        }
+
+        for (int i = 0; i < NUM_STOCKS; i++) {  // price of the stock being random
+            if (stockPrices[i] == 0.0) {
+                stockPrices[i] = 50 + new Random().nextDouble() * 100;
+            }
+        }
+    }
+
+    public static void displayMenu() {  // menu for the stock market simulator
+        System.out.println("Stock Market Simulator");// options for interaction
+        System.out.println("1. View Stocks");
+        System.out.println("2. Buy Stocks");
+        System.out.println("3. Sell Stocks");
+        System.out.println("4. View Portfolio");
+        System.out.println("5. Save Portfolio");
+        System.out.println("6. Exit");
+        System.out.print("Select an option: ");
+    }
+
+    public static void displayStocks() {    // method of displaying stocks
+        System.out.println("Stocks:");
+        for (int i = 0; i < NUM_STOCKS; i++) {
+            double roundedPrice = Math.round(stockPrices[i] * 10.0) / 10.0;
+            System.out.println((i + 1) + ". " + stockNames[i] + " - $" + roundedPrice);     // 1 decimal place for the prices
+        }
+    }
+
+    public static void displayPortfolio() {      //method for displaying the portfolio
+        System.out.println("Portfolio:");
+        boolean hasPurchasedStocks = false;
+        int purchasedStocksCount = 1;
+        double stockValue = 0;
+        for (int i = 0; i < NUM_STOCKS; i++) {
+            stockValue = userShares[i] * stockPrices[i];
+            double roundedValue = Math.round(stockValue * 10.0) / 10.0;
+
+            if(userShares[i] > 0) {
+                hasPurchasedStocks = true;
+                System.out.println(purchasedStocksCount + ". " + stockNames[i] + ": " + userShares[i] + " shares - Value: $" + roundedValue);
+                purchasedStocksCount++;
+            }
+        }
+
+        if (!hasPurchasedStocks){
+            System.out.println("No purchased stocks");
+        }
+
+        double roundedUserBalance = Math.round(userBalance * 10.0) / 10.0;
+        System.out.println("Cash Balance: $" + roundedUserBalance);
+
+        double roundedTotalPortfolioValue = Math.round(calculateTotalPortfolioValue() * 10.0) / 10.0;
+        System.out.println("Total Portfolio Value: $" + roundedTotalPortfolioValue);
+    }
+
+    public static void buyStock(Scanner scanner) { // buying stock method
+        displayStocks();
+        System.out.print("Select a stock to buy: ");
+        int stockIndex = scanner.nextInt() - 1;
+        scanner.nextLine();
+        System.out.print("Enter the number of shares to buy: ");
+        int numShares = scanner.nextInt();
+        scanner.nextLine();
+
+        double totalCost = stockPrices[stockIndex] * numShares;
+
+        if (totalCost > userBalance) {
+            System.out.println("Insufficient funds. Cannot buy stocks.");
+        } else {
+            userShares[stockIndex] += numShares;
+            userBalance -= totalCost;
+            System.out.println("Stocks bought successfully.");
+        }
+    }
+
+    public static void sellStock(Scanner scanner) { // method to sell stocks
+        displayPortfolio();
+        System.out.print("Select a stock to sell: ");
+        int stockIndex = scanner.nextInt() - 1;
+        scanner.nextLine();
+        System.out.print("Enter the number of shares to sell: ");
+        int numShares = scanner.nextInt();
+        scanner.nextLine();
+
+        if (numShares > userShares[stockIndex]) {
+            System.out.println("Insufficient shares. Cannot sell stocks.");
+        } else {
+            double totalValue = stockPrices[stockIndex] * numShares;
+            userShares[stockIndex] -= numShares;
+            userBalance += totalValue;
+            System.out.println("Stocks sold successfully.");
+        }
+    }
+
+    public static double calculateTotalPortfolioValue() { // calculate total money in portfolio
+        double totalValue = userBalance;
+        for (int i = 0; i < NUM_STOCKS; i++) {
+            totalValue += userShares[i] * stockPrices[i];
+        }
+        return totalValue;
+    }
+
+    public static void updateStockPrices() {    // update stock prices for every run
+        Random random = new Random();
+        for (int i = 0; i < NUM_STOCKS; i++) {
+            double variation = (random.nextDouble() - 0.5) * 10;
+            stockPrices[i] += variation;
+            if (stockPrices[i] < 1.0) {
+                stockPrices[i] = 1.0;
+            }
+        }
+    }
+
+    public static void savePortfolio() { // save information to portfolio txt file
+        String fileName = "portfolio.txt";
+        try (FileWriter fileWriter = new FileWriter(fileName)) {
+            for (int i = 0; i < NUM_STOCKS; i++) {
+                fileWriter.write(stockNames[i] + "," + userShares[i] + "," + stockPrices[i] + "\n");
+            }
+            fileWriter.write("Cash Balance," + userBalance + "\n");
+            System.out.println("Portfolio saved successfully to '" + fileName + "'.");
+        } catch (IOException e) {
+            System.out.println("An error occurred when saving portfolio. ");
+        }
+    }
+
+    public static void loadPortfolio() { // load information from the portfolio txt file for next runs
+        String fileName = "portfolio.txt";
+        try (Scanner fileScanner = new Scanner(new File(fileName))) {
+            for (int i = 0; i < NUM_STOCKS && fileScanner.hasNextLine(); i++) {
+                String[] line = fileScanner.nextLine().split(",");
+                if (line.length >= 3) {
+                    stockNames[i] = line[0];
+                    userShares[i] = (int) Double.parseDouble(line[1]);
+                    stockPrices[i] = Double.parseDouble(line[2]);
+                } else {
+                    System.out.println("Invalid format in the portfolio file. Unable to load.");
+                    break;
+                }
+            }
+            if (fileScanner.hasNextLine()) {
+                userBalance = Double.parseDouble(fileScanner.nextLine().split(",")[1]);
+            }
+            System.out.println("Portfolio loaded successfully from '" + fileName + "'.");
+        } catch (FileNotFoundException e) {
+            System.out.println("No saved portfolio found. Starting with default values.");
+        }
+    }
+}
