@@ -1,0 +1,55 @@
+/*  CS&141 Java Programing
+    Assignment 2: Managing a Personal Finance Tracker
+    Group 6: Mustaf Egal, Doug Houston
+    15 October 2023
+ */
+
+public class FinanceTracker {
+    public static void main(String[] args) {
+        String name = "Johnathon Dough";
+        double monthlyIncome = 4000;
+        double rentExpense = 2200;
+        double groceryExpense = 400;
+        double savingTarget = 400;
+        /*  Truncating input to nearest penny to prevent rounding errors in formatted output.
+            This step was added after testing with monthlyIncome = 2999.995 rounded to 3000.00
+            in formatted output but resulted in savings rounded to 399.99 in formatted output
+            Truncating was chosen over rounding because extra digits were considered the more
+            likely input error.
+         */
+        monthlyIncome = (int)(monthlyIncome * 100) / 100.0;
+        rentExpense = (int)(rentExpense * 100) / 100.0;
+        groceryExpense = (int)(groceryExpense * 100) / 100.0;
+        savingTarget = (int)(savingTarget * 100) / 100.0;
+        // Calculations requested in assignment
+        double totalExpenses = rentExpense + groceryExpense;
+        double savings = monthlyIncome - totalExpenses;
+        boolean isGoalMet = savings >= savingTarget;
+        // Added String yesOrNo to conditionally hold "No" if isGoalMet is false or "Yes" if it is true.
+        String yesOrNo = "No";
+        if(isGoalMet){
+            yesOrNo = "Yes";
+        }
+        // Printing User Information
+        System.out.println("Name: " + name);
+        System.out.println("Welcome to your finance tracker!");
+        System.out.println();
+        // Printing results of calculations as formatted text
+        System.out.printf("Monthly Income: $%.2f\n", monthlyIncome);
+        System.out.printf("Rent Expense: $%.2f\n", rentExpense);
+        System.out.printf("Grocery Expense: $%.2f\n", groceryExpense);
+        System.out.println();
+        System.out.printf("Total Expenses: $%.2f\n", totalExpenses);
+        System.out.println();
+        System.out.printf("Savings: $%.2f\n", savings);
+        System.out.println("Saving Goal Met: " + yesOrNo);
+        System.out.println();
+        // Printing Summary
+        System.out.println("Summary:");
+        System.out.println("Name: " + name);
+        System.out.printf("Income: $%.2f\n", monthlyIncome);
+        System.out.printf("Total Expenses: $%.2f\n", totalExpenses);
+        System.out.printf("Savings: $%.2f\n", savings);
+        System.out.println("Saving Goal Met: " + yesOrNo);
+    }
+}
