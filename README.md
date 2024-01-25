@@ -1,2 +1,2 @@
 # SideProjects
-In this project, I wanted to create a project where I pracitced someone of the coding aspects I was learning through my java programming class. While I used the same coding techniques as I did in the class, I appiled them towards a project where I felt I was capable of creating.
+In these projects, I wanted to create something where I practiced some of the coding aspects I was learning through my java programming class. While I used some of the same coding techniques as I learned in the class, I wanted to apply them towards ideas I found interesting. I plan on showcasing all of my side projects here in this github so I can have a public space dedicated to what I am currently working on. 
