@@ -62,7 +62,7 @@ public class StockMarketSimulator {     //declare stock market simulator class
         stockNames[4] = "Netflix";
         stockNames[5] = "Tesla";
         stockNames[6] = "Microsoft";
-        stockNames[7] = "PlayStation";
+        stockNames[7] = "NVIDIA";
         stockNames[8] = "Disney";
         stockNames[9] = "Delta";
 
